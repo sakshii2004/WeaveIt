@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
+import { Chip } from '@/components/ui/chip';
 import { updateProjectAction } from '@/app/actions/projects';
 import { Loader2 } from 'lucide-react';
 import type { Project } from '@/db/schema';
+import { GENRE_SUGGESTIONS } from './CreateProjectDialog';
 
 export interface EditProjectDialogProps {
   project: Project | null;
@@ -106,9 +108,23 @@ function EditProjectForm({ project, onClose, onUpdated }: EditProjectFormProps) 
           </label>
           <Input
             id="edit-genre"
+            placeholder="e.g. Thriller, Drama..."
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
           />
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {GENRE_SUGGESTIONS.map((g) => (
+              <Chip
+                key={g}
+                variant={genre === g ? 'teal' : 'default'}
+                size="sm"
+                className="cursor-pointer transition-colors"
+                onClick={() => setGenre(genre === g ? '' : g)}
+              >
+                {g}
+              </Chip>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-1.5">

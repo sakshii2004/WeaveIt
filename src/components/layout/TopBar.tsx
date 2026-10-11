@@ -24,8 +24,9 @@ export function TopBar() {
   const projectId = isProjectPage ? pathname.split('/')[2] : null;
 
   const isCharactersPage = pathname.includes('/characters');
+  const isChaptersPage = pathname.includes('/chapters');
   const isStoryMapPage = pathname.includes('/story-map') || pathname.includes('/map');
-  const isPlanPage = isProjectPage && !isCharactersPage && !pathname.includes('/vibe') && !isStoryMapPage;
+  const isPlanPage = isProjectPage && !isCharactersPage && !isChaptersPage && !pathname.includes('/vibe') && !isStoryMapPage;
 
   const projectTabs = [
     {
@@ -41,6 +42,13 @@ export function TopBar() {
       active: true,
       current: isStoryMapPage,
       title: 'Visual Story Map canvas',
+    },
+    {
+      label: 'Chapters',
+      href: projectId ? `/projects/${projectId}/chapters` : '#',
+      active: true,
+      current: isChaptersPage,
+      title: 'Chapter outline and scene breakdown',
     },
     {
       label: 'Characters',

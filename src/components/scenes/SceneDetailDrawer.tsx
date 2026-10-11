@@ -18,7 +18,6 @@ import {
   BookOpen,
   MapPin,
   Clock,
-  Sparkles,
   Layers,
   Film,
   Plus,
@@ -26,6 +25,7 @@ import {
   Maximize2,
   Minimize2,
 } from 'lucide-react';
+import { FieldInfo } from '@/components/ui/tooltip';
 import type { SceneWithDetails } from '@/db/queries/scenes';
 import type { Character, Thread, Act, Chapter, Location } from '@/db/schema';
 import { STORY_COLORS } from '@/components/structure/StructureManagementModal';
@@ -90,7 +90,30 @@ export function SceneDetailDrawer({
   onStructureRefreshed,
 }: SceneDetailDrawerProps) {
   const [activeTab, setActiveTab] = React.useState<TabKey>(initialTab);
-  const [isFocusMode, setIsFocusMode] = React.useState(false);
+  const [isFocusMode, setIsFocusMode] = React.useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      const saved = localStorage.getItem('weaveit_scene_inspector_expanded');
+      if (saved !== null) {
+        return saved === 'true';
+      }
+    } catch {
+      // Storage unavailable
+    }
+    return true;
+  });
+
+  const handleToggleFocusMode = () => {
+    setIsFocusMode((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('weaveit_scene_inspector_expanded', String(next));
+      } catch {
+        // Storage unavailable
+      }
+      return next;
+    });
+  };
   const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isDeleting, setIsDeleting] = React.useState(false);
   const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -202,7 +225,7 @@ export function SceneDetailDrawer({
             title: data.title.trim() || scene.title,
             status: data.status as SceneStatus,
             description: data.description.trim() || null,
-            sceneType: (data.sceneType as SceneType) || null,
+            sceneType: data.sceneType?.trim() || null,
             purpose: data.purpose.trim() || null,
             locationId: data.locationId || null,
             chapterId: data.chapterId || null,
@@ -345,7 +368,7 @@ export function SceneDetailDrawer({
             <Button
               variant="ghost"
               size="icon-sm"
-              onClick={() => setIsFocusMode((prev) => !prev)}
+              onClick={handleToggleFocusMode}
               className="text-ink-soft hover:text-ink"
               title={isFocusMode ? 'Dock to standard drawer' : 'Maximize / Focus Mode'}
             >
@@ -401,24 +424,25 @@ export function SceneDetailDrawer({
 
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-ink-soft">Type:</span>
-              <select
+              <input
+                type="text"
+                list="scene-detail-type-suggestions"
                 value={formData.sceneType}
                 onChange={(e) => handleFieldChange('sceneType', e.target.value)}
-                className="rounded-sm border border-line bg-surface-sunken px-2 py-1 text-xs text-ink focus:border-brand focus:outline-none capitalize"
-              >
-                <option value="">None</option>
+                placeholder="Optional"
+                className="w-24 sm:w-28 rounded-sm border border-line bg-surface-sunken px-2 py-1 text-xs text-ink placeholder:text-ink-soft/50 focus:border-brand focus:outline-none capitalize transition-colors"
+              />
+              <datalist id="scene-detail-type-suggestions">
                 {SCENE_TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
+                  <option key={opt.value} value={opt.label} />
                 ))}
-              </select>
+              </datalist>
             </div>
 
             {/* Quick Card Color Accent Selector */}
             <div className="flex items-center gap-1.5 pl-2 border-l border-line">
               <span className="text-xs text-ink-soft">Color:</span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => handleColorChange('')}
@@ -438,15 +462,40 @@ export function SceneDetailDrawer({
                     type="button"
                     onClick={() => handleColorChange(c.key)}
                     className={cn(
-                      'h-4 w-4 rounded-full transition-transform hover:scale-125 cursor-pointer',
+                      'h-4 w-4 rounded-full transition-transform hover:scale-110 cursor-pointer',
                       c.bgClass,
                       formData.color === c.key
-                        ? 'ring-2 ring-brand ring-offset-1 ring-offset-surface scale-110'
+                        ? 'ring-[1.5px] ring-brand ring-offset-1 ring-offset-surface'
                         : 'opacity-70 hover:opacity-100'
                     )}
                     title={c.label}
                   />
                 ))}
+
+                {/* Custom Color Swatch if active */}
+                {formData.color && !STORY_COLORS.some((c) => c.key === formData.color) && (
+                  <button
+                    type="button"
+                    onClick={() => handleColorChange(formData.color)}
+                    style={{ backgroundColor: formData.color }}
+                    className="h-4 w-4 rounded-full ring-[1.5px] ring-brand ring-offset-1 ring-offset-surface shadow-xs cursor-pointer"
+                    title={`Custom color: ${formData.color}`}
+                  />
+                )}
+
+                {/* Plus icon to pick ANY color from color picker */}
+                <label
+                  className="relative flex h-4 w-4 items-center justify-center rounded-full border border-line bg-surface-sunken hover:bg-surface hover:border-brand hover:text-brand text-ink-soft cursor-pointer transition-all hover:scale-110 shadow-2xs"
+                  title="Pick custom color"
+                >
+                  <input
+                    type="color"
+                    value={formData.color?.startsWith('#') ? formData.color : '#0d9488'}
+                    onChange={(e) => handleColorChange(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <Plus className="h-2.5 w-2.5 stroke-[2.5] pointer-events-none" />
+                </label>
               </div>
             </div>
           </div>
@@ -509,7 +558,7 @@ export function SceneDetailDrawer({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-                    <Sparkles className="h-3.5 w-3.5 text-brand" /> Scene Description &amp; Prose Notes
+                    <BookOpen className="h-3.5 w-3.5 text-brand" /> Scene Description &amp; Prose Notes
                   </label>
 
                   {/* Font Size Selector */}
@@ -549,11 +598,11 @@ export function SceneDetailDrawer({
 
               {/* Purpose / Transformation note */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
                   <label className="text-xs font-semibold text-ink">
                     Purpose / What Changes Here?
                   </label>
-                  <span className="text-[11px] text-ink-soft/70">Reader realization &amp; stakes</span>
+                  <FieldInfo content="Reader realization &amp; stakes: What does the reader learn? How does the emotional charge or power balance shift?" />
                 </div>
                 <textarea
                   value={formData.purpose}
@@ -658,9 +707,9 @@ export function SceneDetailDrawer({
                   className="w-full rounded-md border border-line bg-surface px-3 py-2 text-xs text-ink focus:border-brand focus:outline-none"
                 >
                   <option value="">Unassigned (No chapter)</option>
-                  {chapters.map((ch, idx) => (
+                  {chapters.map((ch) => (
                     <option key={ch.id} value={ch.id}>
-                      #{idx + 1} {ch.title}
+                      {ch.title}
                     </option>
                   ))}
                 </select>
@@ -737,6 +786,31 @@ export function SceneDetailDrawer({
                       title={c.label}
                     />
                   ))}
+
+                  {/* Custom Color Swatch if active */}
+                  {formData.color && !STORY_COLORS.some((c) => c.key === formData.color) && (
+                    <button
+                      type="button"
+                      onClick={() => handleFieldChange('color', formData.color)}
+                      style={{ backgroundColor: formData.color }}
+                      className="h-6 w-6 rounded-full ring-2 ring-brand ring-offset-1 ring-offset-surface scale-125 shadow-xs cursor-pointer"
+                      title={`Custom color: ${formData.color}`}
+                    />
+                  )}
+
+                  {/* Plus icon to pick ANY color */}
+                  <label
+                    className="relative flex h-6 w-6 items-center justify-center rounded-full border border-line bg-surface-sunken hover:bg-surface hover:border-brand hover:text-brand text-ink-soft cursor-pointer transition-all hover:scale-110 shadow-2xs"
+                    title="Pick custom color"
+                  >
+                    <input
+                      type="color"
+                      value={formData.color?.startsWith('#') ? formData.color : '#0d9488'}
+                      onChange={(e) => handleFieldChange('color', e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                    <Plus className="h-3.5 w-3.5 stroke-[2.5] pointer-events-none" />
+                  </label>
                 </div>
               </div>
             </div>

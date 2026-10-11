@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, Compass, Plus, FileText, User, LayoutDashboard } from 'lucide-react';
+import { Search, Compass, Plus, FileText, User, LayoutDashboard, Layers } from 'lucide-react';
 import { useUIStore } from '@/stores/ui-store';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
@@ -33,6 +33,12 @@ export function CommandPalette() {
       label: 'Story Scenes & Outline',
       href: projectId ? `/projects/${projectId}` : '/dashboard',
       hint: projectId ? 'Plan' : 'Dashboard',
+    },
+    {
+      icon: <Layers className="h-4 w-4 text-violet-500" strokeWidth={1.75} />,
+      label: 'Chapters Overview',
+      href: projectId ? `/projects/${projectId}/chapters` : '/dashboard',
+      hint: projectId ? 'Chapters' : 'Dashboard',
     },
     {
       icon: <User className="h-4 w-4 text-sun" strokeWidth={1.75} />,

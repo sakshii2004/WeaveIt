@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FieldInfo } from '@/components/ui/tooltip';
 
 export interface SelectOption {
   label: string;
@@ -23,12 +24,15 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full space-y-1.5 text-left">
         {label && (
-          <label
-            htmlFor={selectId}
-            className="block text-xs font-semibold uppercase tracking-wider text-ink-soft"
-          >
-            {label}
-          </label>
+          <div className="flex items-center gap-1.5">
+            <label
+              htmlFor={selectId}
+              className="block text-xs font-semibold uppercase tracking-wider text-ink-soft"
+            >
+              {label}
+            </label>
+            {hint && <FieldInfo content={hint} />}
+          </div>
         )}
         <div className="relative">
           <select
@@ -59,8 +63,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         </div>
         {error ? (
           <p className="text-xs text-coral font-medium">{error}</p>
-        ) : hint ? (
-          <p className="text-xs text-ink-soft">{hint}</p>
+        ) : !label && hint ? (
+          <div className="flex justify-end">
+            <FieldInfo content={hint} />
+          </div>
         ) : null}
       </div>
     );

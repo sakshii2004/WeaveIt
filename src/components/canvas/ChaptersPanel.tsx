@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 export function ChaptersPanel() {
   const {
     projectId,
-    mapId,
     chapters,
     nodes,
     chaptersPanelOpen,
@@ -30,10 +29,12 @@ export function ChaptersPanel() {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    await createChapterAction(projectId, {
+    const res = await createChapterAction(projectId, {
       title: newTitle.trim(),
-      mapId,
     });
+    if (res.success && res.data) {
+      useStoryMapStore.getState().addChapter(res.data);
+    }
     setNewTitle('');
     setIsAdding(false);
   };

@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { STATUS_VARIANTS } from '@/components/scenes/SceneCard';
 import {
-  Sparkles,
   Check,
   Loader2,
   Film,
@@ -25,7 +24,9 @@ import {
   Compass,
   AlertCircle,
   HelpCircle,
+  Target,
 } from 'lucide-react';
+import { FieldInfo } from '@/components/ui/tooltip';
 import { v7 as uuidv7 } from 'uuid';
 
 export interface PlayEditorProps {
@@ -371,13 +372,11 @@ export function PlayEditor({
 
       {/* Purpose & Dramatic Shift Card (PRD §8.6) */}
       <div className="rounded-md border border-line bg-surface p-4 space-y-1.5 shadow-2xs">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-brand" /> Scene Purpose &amp; Stakes
+            <Target className="h-3.5 w-3.5 text-brand" /> Scene Purpose &amp; Stakes
           </label>
-          <span className="text-[11px] text-ink-soft/70">
-            What does the reader learn / what changes here?
-          </span>
+          <FieldInfo content="What does the reader learn / what changes here?" />
         </div>
         <textarea
           value={purposeNote}
@@ -423,7 +422,7 @@ export function PlayEditor({
                   onClick={handleSeedFromDescription}
                   className="gap-1.5 text-xs border-brand/30 text-brand hover:bg-brand-soft"
                 >
-                  <Sparkles className="h-3.5 w-3.5" /> Seed from Scene Description
+                  <FileText className="h-3.5 w-3.5" /> Seed from Scene Description
                 </Button>
               )}
               <Button

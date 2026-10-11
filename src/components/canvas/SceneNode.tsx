@@ -7,7 +7,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useStoryMapStore, type SceneNodeData } from '@/stores/story-map-store';
 import { STATUS_VARIANTS } from '@/components/scenes/SceneCard';
-import { Edit2, Trash2, Layers, BookOpen, Palette } from 'lucide-react';
+import { Edit2, Trash2, Layers, BookOpen, Palette, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STORY_COLORS } from '@/components/structure/StructureManagementModal';
 import { updateSceneAction } from '@/app/actions/scenes';
@@ -91,6 +91,7 @@ export function SceneNode({ id, data, selected }: NodeProps & { data: SceneNodeD
 
   const effectiveColor = data.color || data.act?.color;
   const theme = effectiveColor ? STORY_CARD_THEMES[effectiveColor] : null;
+  const isCustomColor = Boolean(effectiveColor && !theme);
   const statusVariant = STATUS_VARIANTS[data.status] || 'teal';
   const statusLabel = data.status.charAt(0).toUpperCase() + data.status.slice(1);
 
@@ -129,6 +130,7 @@ export function SceneNode({ id, data, selected }: NodeProps & { data: SceneNodeD
         selected && 'ring-2 ring-brand ring-offset-2 ring-offset-surface shadow-md border-transparent',
         data.isDimmed && 'opacity-25 hover:opacity-100 pointer-events-auto'
       )}
+      style={isCustomColor ? { borderColor: `${effectiveColor}60` } : undefined}
     >
       {/* React Flow Handles */}
       <Handle
@@ -148,8 +150,9 @@ export function SceneNode({ id, data, selected }: NodeProps & { data: SceneNodeD
       <div
         className={cn(
           'h-1.5 w-full rounded-t-[11px] transition-colors',
-          theme ? theme.bar : 'bg-line'
+          theme ? theme.bar : isCustomColor ? '' : 'bg-line'
         )}
+        style={isCustomColor ? { backgroundColor: effectiveColor } : undefined}
       />
 
       {/* Card Content */}
@@ -195,32 +198,78 @@ export function SceneNode({ id, data, selected }: NodeProps & { data: SceneNodeD
             </button>
 
             {colorPickerOpen && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 top-6 z-50 flex items-center gap-1 rounded-md border border-line bg-surface p-1.5 shadow-md"
-              >
-                {STORY_COLORS.map((c) => (
-                  <button
-                    key={c.key}
-                    type="button"
-                    onClick={(e) => handleSetColor(c.key, e)}
-                    className={cn(
-                      'h-3.5 w-3.5 rounded-full transition-transform hover:scale-125',
-                      c.bgClass,
-                      data.color === c.key && 'ring-2 ring-brand ring-offset-1'
-                    )}
-                    title={c.label}
-                  />
-                ))}
-                <button
-                  type="button"
-                  onClick={(e) => handleSetColor(null, e)}
-                  className="px-1 text-[10px] text-ink-soft hover:text-coral hover:bg-surface-sunken rounded-xs"
-                  title="Clear color"
+              <>
+                <div
+                  className="fixed inset-0 z-40 cursor-default"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setColorPickerOpen(false);
+                  }}
+                />
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 top-7 z-50 rounded-lg border border-line/90 bg-surface/95 p-2 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-120 ease-out select-none"
                 >
-                  ✕
-                </button>
-              </div>
+                  <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-line/60 gap-3">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-soft">
+                      Card Accent
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleSetColor(null, e)}
+                      className="text-[10px] font-medium text-ink-soft hover:text-coral transition-colors px-1 py-0.5 rounded hover:bg-surface-sunken"
+                      title="Reset to default color"
+                    >
+                      Auto
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {STORY_COLORS.map((c) => (
+                      <button
+                        key={c.key}
+                        type="button"
+                        onClick={(e) => handleSetColor(c.key, e)}
+                        className={cn(
+                          'h-4 w-4 rounded-full transition-transform hover:scale-110 cursor-pointer',
+                          c.bgClass,
+                          data.color === c.key && 'ring-[1.5px] ring-brand ring-offset-1 ring-offset-surface'
+                        )}
+                        title={c.label}
+                      />
+                    ))}
+
+                    {/* Custom Color Swatch if active */}
+                    {data.color && !STORY_COLORS.some((c) => c.key === data.color) && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleSetColor(data.color, e)}
+                        style={{ backgroundColor: data.color }}
+                        className="h-4 w-4 rounded-full ring-[1.5px] ring-brand ring-offset-1 ring-offset-surface shadow-xs cursor-pointer"
+                        title={`Custom color: ${data.color}`}
+                      />
+                    )}
+
+                    {/* Plus icon to pick ANY color */}
+                    <label
+                      className="relative flex h-4 w-4 items-center justify-center rounded-full border border-line bg-surface-sunken hover:border-brand hover:text-brand text-ink-soft cursor-pointer transition-transform hover:scale-110 shadow-2xs"
+                      title="Pick custom color"
+                    >
+                      <input
+                        type="color"
+                        value={data.color?.startsWith('#') ? data.color : '#0d9488'}
+                        onChange={(e) => {
+                          const chosen = e.target.value;
+                          setColorPickerOpen(false);
+                          updateSceneData(data.sceneId, { color: chosen });
+                          updateSceneAction(data.sceneId, { color: chosen });
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                      <Plus className="h-2.5 w-2.5 stroke-[2.5] pointer-events-none" />
+                    </label>
+                  </div>
+                </div>
+              </>
             )}
 
             <button

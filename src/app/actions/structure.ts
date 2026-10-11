@@ -16,6 +16,7 @@ import {
   updateAct,
   deleteAct,
   reorderActs,
+  listChaptersByProject,
   createChapter,
   updateChapter,
   deleteChapter,
@@ -168,6 +169,17 @@ export async function createChapterAction(
 
   try {
     await requireProjectAccess(projectId, session.user.id);
+
+    // Prevent duplicate chapter titles within the same project
+    const existingChapters = await listChaptersByProject(projectId);
+    const normalizedTitle = parsed.data.title.trim().toLowerCase();
+    const duplicate = existingChapters.find(
+      (ch) => ch.title.trim().toLowerCase() === normalizedTitle
+    );
+    if (duplicate) {
+      return { success: false, error: `A chapter titled "${duplicate.title}" already exists.` };
+    }
+
     const chapter = await createChapter({ projectId, ...parsed.data });
     revalidatePath(`/projects/${projectId}`);
     return { success: true, data: chapter };

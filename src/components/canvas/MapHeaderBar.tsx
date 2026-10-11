@@ -19,7 +19,7 @@ import {
   Undo2,
   Redo2,
   Grid,
-  Sparkles,
+  LayoutGrid,
   Filter,
   BookOpen,
   Film,
@@ -302,7 +302,7 @@ export function MapHeaderBar({ allMaps, onOpenCreateScene }: MapHeaderBarProps) 
           className="h-7 px-2.5 text-xs gap-1"
           title="Auto-arrange scenes into sequence order from left to right (undoable)"
         >
-          <Sparkles className="h-3.5 w-3.5 text-brand" /> Auto-Arrange
+          <LayoutGrid className="h-3.5 w-3.5 text-brand" /> Auto-Arrange
         </Button>
 
         {/* Snap to Grid Toggle */}

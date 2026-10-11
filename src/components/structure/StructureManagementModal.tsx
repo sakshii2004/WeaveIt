@@ -446,7 +446,7 @@ export function StructureManagementModal({
                     No chapters defined yet. Add chapter titles to group your story scenes.
                   </p>
                 ) : (
-                  chapters.map((ch, idx) => (
+                  chapters.map((ch) => (
                     <div key={ch.id} className="flex items-center justify-between bg-surface p-3 rounded-md border border-line text-xs">
                       {editingId === ch.id ? (
                         <div className="flex items-center gap-2 flex-1 mr-2">
@@ -466,7 +466,6 @@ export function StructureManagementModal({
                       ) : (
                         <>
                           <div className="flex items-center gap-2.5">
-                            <span className="font-mono text-ink-soft text-[11px] font-semibold w-6">#{idx + 1}</span>
                             <span className="font-semibold text-ink">{ch.title}</span>
                           </div>
                           <div className="flex items-center gap-1">

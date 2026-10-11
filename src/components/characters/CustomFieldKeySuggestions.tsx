@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Sparkles } from 'lucide-react';
+import { Tag } from 'lucide-react';
 
 interface CustomFieldKeySuggestionsProps {
   genre?: string | null;
@@ -44,7 +44,7 @@ export function CustomFieldKeySuggestions({
   return (
     <div className="space-y-1.5 pt-1">
       <div className="flex items-center gap-1.5 text-[11px] font-medium text-ink-soft">
-        <Sparkles className="h-3 w-3 text-story-sun-text" />
+        <Tag className="h-3 w-3 text-story-sun-text" />
         <span>Suggestions</span>
       </div>
       <div className="flex flex-wrap gap-1.5">

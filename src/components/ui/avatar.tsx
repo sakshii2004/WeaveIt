@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +19,21 @@ export function Avatar({
   ...props
 }: AvatarProps) {
   const [imageError, setImageError] = React.useState(false);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+
+  // Reset image error state whenever src changes
+  React.useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
+  // Check if image errored before React hydration or failed to load
+  React.useEffect(() => {
+    if (src && imgRef.current) {
+      if (imgRef.current.complete && imgRef.current.naturalWidth === 0) {
+        setImageError(true);
+      }
+    }
+  }, [src]);
 
   const getInitials = (str: string) => {
     if (!str) return '?';
@@ -31,6 +48,8 @@ export function Avatar({
     lg: 'h-10 w-10 text-sm',
   };
 
+  const hasValidSrc = Boolean(src && typeof src === 'string' && src.trim().length > 0 && !imageError);
+
   return (
     <div
       className={cn(
@@ -40,11 +59,14 @@ export function Avatar({
       )}
       {...props}
     >
-      {src && !imageError ? (
+      {hasValidSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={src}
+          ref={imgRef}
+          src={src!}
           alt={alt || name}
+          referrerPolicy="no-referrer"
+          crossOrigin="anonymous"
           className="h-full w-full object-cover"
           onError={() => setImageError(true)}
         />

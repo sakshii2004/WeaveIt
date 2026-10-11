@@ -15,6 +15,7 @@ import { Select } from '@/components/ui/select';
 import { createCharacterAction } from '@/app/actions/characters';
 import { useToast } from '@/components/ui/toast';
 import { Loader2 } from 'lucide-react';
+import { FieldInfo } from '@/components/ui/tooltip';
 import type { Character } from '@/db/schema';
 
 interface CreateCharacterDialogProps {
@@ -167,9 +168,12 @@ export function CreateCharacterDialog({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft">
-                Character Background, Voice &amp; Physical Presence
-              </label>
+              <div className="flex items-center gap-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft">
+                  Character Background, Voice &amp; Physical Presence
+                </label>
+                <FieldInfo content="Feel free to note personality traits, speech patterns, physical marks, or internal conflicts." />
+              </div>
               <span className="text-[11px] font-mono text-ink-soft/70">
                 Source Serif 4 · {description.trim().length > 0 ? `${description.trim().split(/\s+/).length} words` : '0 words'}
               </span>
@@ -181,9 +185,6 @@ export function CreateCharacterDialog({
               rows={6}
               className="font-serif text-[16px] leading-relaxed bg-surface-sunken/40 focus:bg-surface border-line min-h-[140px] resize-y p-3.5"
             />
-            <p className="text-[11px] text-ink-soft/70">
-              Feel free to note personality traits, speech patterns, physical marks, or internal conflicts.
-            </p>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-line">

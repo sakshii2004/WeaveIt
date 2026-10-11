@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { FieldInfo } from '@/components/ui/tooltip';
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -17,12 +18,15 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="w-full space-y-1.5 text-left">
         {label && (
-          <label
-            htmlFor={textareaId}
-            className="block text-xs font-semibold uppercase tracking-wider text-ink-soft"
-          >
-            {label}
-          </label>
+          <div className="flex items-center gap-1.5">
+            <label
+              htmlFor={textareaId}
+              className="block text-xs font-semibold uppercase tracking-wider text-ink-soft"
+            >
+              {label}
+            </label>
+            {hint && <FieldInfo content={hint} />}
+          </div>
         )}
         <textarea
           id={textareaId}
@@ -40,8 +44,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         />
         {error ? (
           <p className="text-xs text-coral font-medium">{error}</p>
-        ) : hint ? (
-          <p className="text-xs text-ink-soft">{hint}</p>
+        ) : !label && hint ? (
+          <div className="flex justify-end">
+            <FieldInfo content={hint} />
+          </div>
         ) : null}
       </div>
     );

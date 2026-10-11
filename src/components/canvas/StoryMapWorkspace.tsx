@@ -47,7 +47,14 @@ export function StoryMapWorkspace({
   const [createSceneOpen, setCreateSceneOpen] = React.useState(false);
 
   // Transform initial DB nodes to React Flow nodes
+  const initializedMapIdRef = React.useRef<string | null>(null);
+
   React.useEffect(() => {
+    if (initializedMapIdRef.current === initialDetails.map.id) {
+      return;
+    }
+    initializedMapIdRef.current = initialDetails.map.id;
+
     const flowNodes: Node<SceneNodeData>[] = initialDetails.nodes.map((n) => ({
       id: n.id,
       type: 'sceneNode',

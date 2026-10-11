@@ -55,7 +55,7 @@ describe('Scenes Validators', () => {
       expect(parsed.success).toBe(false);
     });
 
-    it('validates all allowed sceneType values', () => {
+    it('validates all allowed sceneType values and accepts custom types', () => {
       for (const sceneType of SCENE_TYPES) {
         const parsed = createSceneSchema.safeParse({
           title: 'A scene',
@@ -63,6 +63,11 @@ describe('Scenes Validators', () => {
         });
         expect(parsed.success).toBe(true);
       }
+
+      // Also accepts custom types or empty values
+      expect(createSceneSchema.safeParse({ title: 'A scene', sceneType: 'Flashback' }).success).toBe(true);
+      expect(createSceneSchema.safeParse({ title: 'A scene', sceneType: '' }).success).toBe(true);
+      expect(createSceneSchema.safeParse({ title: 'A scene', sceneType: null }).success).toBe(true);
     });
 
     it('accepts character joins and thread joins', () => {

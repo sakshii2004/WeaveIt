@@ -88,6 +88,7 @@ export async function updateSceneAction(
     }
 
     revalidatePath(`/projects/${scene.projectId}`);
+    revalidatePath(`/projects/${scene.projectId}/story-map`);
     return { success: true, data: updated };
   } catch (err: unknown) {
     if (err instanceof NotFoundError || err instanceof ForbiddenError) {

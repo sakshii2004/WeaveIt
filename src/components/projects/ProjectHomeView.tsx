@@ -10,7 +10,7 @@ import { EditProjectDialog } from './EditProjectDialog';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Edit3, ArrowLeft, Map, Users, Layers, Sparkles, BookOpen } from 'lucide-react';
+import { Edit3, ArrowLeft, Map, Users, Layers, PlusCircle, BookOpen } from 'lucide-react';
 import type { Project, Act, Chapter, Location, Thread, Character, StoryMap } from '@/db/schema';
 import type { SceneWithDetails } from '@/db/queries/scenes';
 
@@ -106,7 +106,7 @@ export function ProjectHomeView({
       <div className="rounded-md border border-line bg-surface-sunken p-5 sm:p-6 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-brand" /> Quick-Capture Scene
+            <PlusCircle className="h-4 w-4 text-brand" /> Quick-Capture Scene
           </h2>
           <span className="text-xs text-ink-soft">
             {initialScenes.length} {initialScenes.length === 1 ? 'scene captured' : 'scenes captured'}
@@ -120,7 +120,7 @@ export function ProjectHomeView({
       </div>
 
       {/* Workspace Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Story Map Shortcut Card */}
         <Link href={`/projects/${project.id}/story-map`} className="block">
           <Card className="hover:border-brand/60 transition-all hover:shadow-xs cursor-pointer h-full">
@@ -171,6 +171,26 @@ export function ProjectHomeView({
             </div>
           </CardContent>
         </Card>
+
+        {/* Chapters Overview Card */}
+        <Link href={`/projects/${project.id}/chapters`} className="block group">
+          <Card className="hover:border-brand/50 hover:shadow-sm transition-all h-full flex flex-col justify-between">
+            <CardHeader>
+              <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-story-lavender-bg text-story-lavender-text mb-1 group-hover:scale-105 transition-transform">
+                <Layers className="h-4 w-4" strokeWidth={1.75} />
+              </div>
+              <CardTitle className="group-hover:text-brand transition-colors">Chapters ({chapters.length})</CardTitle>
+              <CardDescription>
+                Chapter-wise view of your novel outline with scene breakdown.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <span className="text-xs font-semibold text-brand inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                Open Chapter Overview &rarr;
+              </span>
+            </CardContent>
+          </Card>
+        </Link>
 
         {/* Characters Card */}
         <Link href={`/projects/${project.id}/characters`} className="block group">

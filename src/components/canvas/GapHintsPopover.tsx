@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useStoryMapStore } from '@/stores/story-map-store';
-import { AlertCircle, Info, Sparkles, X, ChevronRight } from 'lucide-react';
+import { AlertCircle, Info, X, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function GapHintsPopover() {
@@ -48,7 +48,7 @@ export function GapHintsPopover() {
         <div className="absolute top-full mt-1.5 left-0 z-50 w-80 rounded-md border border-line bg-surface p-3 shadow-xl backdrop-blur-md">
           <div className="flex items-center justify-between pb-2 border-b border-line mb-2">
             <span className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-sun" />
+              <Info className="h-3.5 w-3.5 text-sun" />
               Quiet Gap Hints
             </span>
             <button

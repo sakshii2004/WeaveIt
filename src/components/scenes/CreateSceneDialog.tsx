@@ -10,8 +10,8 @@ import { CharacterJoinSelector, type CharacterJoinItem } from './CharacterJoinSe
 import { ThreadJoinSelector } from './ThreadJoinSelector';
 import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
+import { FieldInfo } from '@/components/ui/tooltip';
 import {
-  Sparkles,
   Loader2,
   Plus,
   BookOpen,
@@ -212,7 +212,7 @@ export function CreateSceneDialog({
         actId: actId || null,
         chapterId: chapterId || null,
         locationId: locationId || null,
-        sceneType: (sceneType as SceneType) || null,
+        sceneType: sceneType.trim() || null,
         status,
         timeLabel: timeLabel.trim() || null,
         characters: selectedCharacters.map((c) => ({
@@ -296,7 +296,7 @@ export function CreateSceneDialog({
           <div className="flex items-center justify-between border-b border-line px-6 py-4 bg-surface shrink-0">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-soft text-brand">
-                <Sparkles className="h-5 w-5" />
+                <BookOpen className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -326,13 +326,11 @@ export function CreateSceneDialog({
             <div className="lg:col-span-8 p-6 sm:p-7 space-y-6 flex flex-col bg-surface overflow-y-auto">
               {/* Title Input */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">
                     Scene Title
                   </label>
-                  <span className="text-[11px] text-ink-soft/70">
-                    Auto-derives from prose if omitted
-                  </span>
+                  <FieldInfo content="Auto-derives from prose if omitted." />
                 </div>
                 <Input
                   type="text"
@@ -393,7 +391,10 @@ export function CreateSceneDialog({
                 />
 
                 <div className="flex items-center justify-between text-[11px] text-ink-soft/70">
-                  <span>Tip: Write raw dialogue, atmosphere, or key story beats. Markdown supported.</span>
+                  <div className="flex items-center gap-1">
+                    <span>Drafting notes</span>
+                    <FieldInfo content="Tip: Write raw dialogue, atmosphere, or key story beats. Markdown supported." />
+                  </div>
                   <span className="font-mono">{FONT_SIZE_MAP[fontSize].description} ({FONT_SIZE_MAP[fontSize].label})</span>
                 </div>
               </div>
@@ -403,10 +404,8 @@ export function CreateSceneDialog({
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-ink">
                   <Target className="h-4 w-4 text-brand" />
                   <span>Core Dramatic Purpose &amp; Value Shift</span>
+                  <FieldInfo content="Why does this scene exist? What value shifts from start to finish? (e.g. trust to suspicion, danger to safety)." />
                 </div>
-                <p className="text-[11px] text-ink-soft leading-relaxed">
-                  Why does this scene exist? What value shifts from start to finish? (e.g. trust to suspicion, danger to safety).
-                </p>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
@@ -418,169 +417,170 @@ export function CreateSceneDialog({
             </div>
 
             {/* Story Architecture Rail (Right 4 Cols) */}
-            <div className="lg:col-span-4 p-6 space-y-5 bg-surface-sunken/20 overflow-y-auto">
+            <div className="lg:col-span-4 p-5 sm:p-6 space-y-3 bg-surface-sunken/20 overflow-y-auto">
               <div className="flex items-center justify-between pb-1 border-b border-line">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-ink-soft flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5 text-brand" /> Story Architecture
                 </h3>
-                <span className="text-[11px] text-ink-soft">Optional anchors</span>
+                <FieldInfo content="Optional architectural anchors for your scene." />
               </div>
 
-              {/* Act & Chapter */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-ink">Act Placement</label>
-                  <select
-                    value={actId}
-                    onChange={(e) => setActId(e.target.value)}
-                    className="w-full rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs text-ink focus:border-brand focus:outline-none shadow-xs"
+              {/* Act Placement */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-ink">Act Placement</label>
+                <select
+                  value={actId}
+                  onChange={(e) => setActId(e.target.value)}
+                  className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-ink focus:border-brand focus:outline-none shadow-xs transition-colors"
+                >
+                  <option value="">Unassigned (Seed tray)</option>
+                  {acts.map((act) => (
+                    <option key={act.id} value={act.id}>
+                      {act.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Chapter */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-ink">Chapter</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddChapter(!showAddChapter)}
+                    className="text-[11px] text-brand hover:underline"
                   >
-                    <option value="">Unassigned (Seed tray)</option>
-                    {acts.map((act) => (
-                      <option key={act.id} value={act.id}>
-                        {act.name}
+                    {showAddChapter ? 'Cancel' : '+ New Chapter'}
+                  </button>
+                </div>
+                {showAddChapter ? (
+                  <form onSubmit={handleCreateInlineChapter} className="flex gap-1.5">
+                    <Input
+                      value={inlineChapterTitle}
+                      onChange={(e) => setInlineChapterTitle(e.target.value)}
+                      placeholder="Chapter title..."
+                      className="h-8 text-xs bg-surface"
+                      autoFocus
+                    />
+                    <Button type="submit" size="sm" variant="secondary" className="h-8 px-2.5 text-xs">
+                      Add
+                    </Button>
+                  </form>
+                ) : (
+                  <select
+                    value={chapterId}
+                    onChange={(e) => setChapterId(e.target.value)}
+                    className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-ink focus:border-brand focus:outline-none shadow-xs transition-colors"
+                  >
+                    <option value="">No Chapter</option>
+                    {chapters.map((ch) => (
+                      <option key={ch.id} value={ch.id}>
+                        {ch.title}
                       </option>
                     ))}
                   </select>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-ink">Chapter</label>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddChapter(!showAddChapter)}
-                      className="text-[11px] text-brand hover:underline"
-                    >
-                      {showAddChapter ? 'Cancel' : '+ New'}
-                    </button>
-                  </div>
-                  {showAddChapter ? (
-                    <form onSubmit={handleCreateInlineChapter} className="flex gap-1">
-                      <Input
-                        value={inlineChapterTitle}
-                        onChange={(e) => setInlineChapterTitle(e.target.value)}
-                        placeholder="Chapter title..."
-                        className="h-7 text-xs bg-surface"
-                        autoFocus
-                      />
-                      <Button type="submit" size="sm" variant="secondary" className="h-7 px-2 text-xs">
-                        Add
-                      </Button>
-                    </form>
-                  ) : (
-                    <select
-                      value={chapterId}
-                      onChange={(e) => setChapterId(e.target.value)}
-                      className="w-full rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs text-ink focus:border-brand focus:outline-none shadow-xs"
-                    >
-                      <option value="">No Chapter</option>
-                      {chapters.map((ch) => (
-                        <option key={ch.id} value={ch.id}>
-                          {ch.title}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
+                )}
               </div>
 
-              {/* Location & Time */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-ink flex items-center gap-1">
-                      <MapPin className="h-3 w-3 text-ink-soft" /> Setting / Location
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddLocation(!showAddLocation)}
-                      className="text-[11px] text-brand hover:underline"
-                    >
-                      {showAddLocation ? 'Cancel' : '+ New'}
-                    </button>
-                  </div>
-                  {showAddLocation ? (
-                    <form onSubmit={handleCreateInlineLocation} className="flex gap-1">
-                      <Input
-                        value={inlineLocName}
-                        onChange={(e) => setInlineLocName(e.target.value)}
-                        placeholder="Location name..."
-                        className="h-7 text-xs bg-surface"
-                        autoFocus
-                      />
-                      <Button type="submit" size="sm" variant="secondary" className="h-7 px-2 text-xs">
-                        Add
-                      </Button>
-                    </form>
-                  ) : (
-                    <select
-                      value={locationId}
-                      onChange={(e) => setLocationId(e.target.value)}
-                      className="w-full rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs text-ink focus:border-brand focus:outline-none shadow-xs"
-                    >
-                      <option value="">None / Unspecified</option>
-                      {locations.map((loc) => (
-                        <option key={loc.id} value={loc.id}>
-                          {loc.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-ink flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-ink-soft" /> Time Anchor
+              {/* Setting / Location */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-ink-soft" /> Setting / Location
                   </label>
-                  <Input
-                    type="text"
-                    value={timeLabel}
-                    onChange={(e) => setTimeLabel(e.target.value)}
-                    placeholder="e.g. Dawn, Day 3"
-                    className="h-8 text-xs bg-surface"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAddLocation(!showAddLocation)}
+                    className="text-[11px] text-brand hover:underline"
+                  >
+                    {showAddLocation ? 'Cancel' : '+ New Location'}
+                  </button>
                 </div>
+                {showAddLocation ? (
+                  <form onSubmit={handleCreateInlineLocation} className="flex gap-1.5">
+                    <Input
+                      value={inlineLocName}
+                      onChange={(e) => setInlineLocName(e.target.value)}
+                      placeholder="Location name..."
+                      className="h-8 text-xs bg-surface"
+                      autoFocus
+                    />
+                    <Button type="submit" size="sm" variant="secondary" className="h-8 px-2.5 text-xs">
+                      Add
+                    </Button>
+                  </form>
+                ) : (
+                  <select
+                    value={locationId}
+                    onChange={(e) => setLocationId(e.target.value)}
+                    className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-ink focus:border-brand focus:outline-none shadow-xs transition-colors"
+                  >
+                    <option value="">None / Unspecified</option>
+                    {locations.map((loc) => (
+                      <option key={loc.id} value={loc.id}>
+                        {loc.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
-              {/* Scene Type & Status */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-ink flex items-center gap-1">
-                    <Compass className="h-3 w-3 text-ink-soft" /> Dramatic Function
-                  </label>
-                  <select
-                    value={sceneType}
-                    onChange={(e) => setSceneType(e.target.value as SceneType)}
-                    className="w-full rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs text-ink focus:border-brand focus:outline-none capitalize shadow-xs"
-                  >
-                    <option value="">Select Function...</option>
-                    {SCENE_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Time Anchor */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-ink-soft" /> Time Anchor
+                </label>
+                <Input
+                  type="text"
+                  value={timeLabel}
+                  onChange={(e) => setTimeLabel(e.target.value)}
+                  placeholder="e.g. Dawn, Day 3; Two days after the storm"
+                  className="h-8 text-xs bg-surface"
+                />
+              </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-ink">Maturity Status</label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as SceneStatus)}
-                    className="w-full rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs font-medium text-ink focus:border-brand focus:outline-none shadow-xs"
-                  >
-                    {STATUS_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+              {/* Dramatic Function (Dedicated full-width row) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
+                    <Compass className="h-3.5 w-3.5 text-brand" /> Dramatic Function
+                  </label>
+                  <span className="text-[11px] text-ink-soft/70">Optional</span>
                 </div>
+                <input
+                  type="text"
+                  list="create-scene-type-suggestions"
+                  value={sceneType}
+                  onChange={(e) => setSceneType(e.target.value)}
+                  placeholder="e.g. Setup, Inciting Incident, Plot Twist, Climax..."
+                  className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-ink placeholder:text-ink-soft/50 focus:border-brand focus:outline-none shadow-xs transition-colors"
+                />
+                <datalist id="create-scene-type-suggestions">
+                  {SCENE_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.label} />
+                  ))}
+                </datalist>
+              </div>
+
+              {/* Maturity Status */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-ink">Maturity Status</label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as SceneStatus)}
+                  className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink focus:border-brand focus:outline-none shadow-xs transition-colors"
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Cast Tagging */}
-              <div className="space-y-1.5 pt-2 border-t border-line">
+              <div className="space-y-1 pt-2 border-t border-line">
                 <label className="text-xs font-semibold text-ink">Characters Present in Scene</label>
                 <CharacterJoinSelector
                   allCharacters={characters}
@@ -666,7 +666,7 @@ export function CreateSceneDialog({
                 {submittingAction === 'create' ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <Plus className="h-3.5 w-3.5" />
                 )}
                 Create Scene
               </Button>

@@ -132,6 +132,8 @@ interface StoryMapStoreState {
   setInspectedScene: (scene: SceneWithDetails | null) => void;
   clearValidationError: () => void;
 
+  addChapter: (chapter: Chapter) => void;
+
   // Undo / Redo
   undo: () => void;
   redo: () => void;
@@ -677,6 +679,14 @@ export const useStoryMapStore = create<StoryMapStoreState>((set, get) => ({
   setGapHintsOpen: (open) => set({ gapHintsOpen: open }),
   setInspectedScene: (scene) => set({ inspectedScene: scene }),
   clearValidationError: () => set({ validationError: null }),
+
+  addChapter: (chapter) => {
+    set((state) => {
+      // Avoid duplicates
+      if (state.chapters.some((c) => c.id === chapter.id)) return state;
+      return { chapters: [...state.chapters, chapter].sort((a, b) => a.orderIndex - b.orderIndex) };
+    });
+  },
 
   undo: () => {
     const { past, nodes, edges, future } = get();

@@ -16,14 +16,14 @@ export const SCENE_TYPES = [
   'connective',
   'other',
 ] as const;
-export type SceneType = (typeof SCENE_TYPES)[number];
+export type SceneType = string;
 
 export const createSceneSchema = z
   .object({
     title: z.string().trim().max(255, 'Title cannot exceed 255 characters').optional().or(z.literal('')),
     description: z.string().max(20000, 'Description cannot exceed 20,000 characters').optional().nullable(),
     status: z.enum(SCENE_STATUSES).default('seed'),
-    sceneType: z.enum(SCENE_TYPES).optional().nullable(),
+    sceneType: z.string().trim().max(100, 'Scene type cannot exceed 100 characters').optional().nullable().or(z.literal('')),
     purpose: z.string().max(5000, 'Purpose note cannot exceed 5,000 characters').optional().nullable(),
     locationId: z.string().uuid('Invalid location ID').optional().nullable().or(z.literal('')),
     chapterId: z.string().uuid('Invalid chapter ID').optional().nullable().or(z.literal('')),
@@ -58,7 +58,7 @@ export const updateSceneSchema = z.object({
   title: z.string().trim().min(1, 'Title cannot be empty').max(255, 'Title cannot exceed 255 characters').optional(),
   description: z.string().max(20000, 'Description cannot exceed 20,000 characters').optional().nullable(),
   status: z.enum(SCENE_STATUSES).optional(),
-  sceneType: z.enum(SCENE_TYPES).optional().nullable(),
+  sceneType: z.string().trim().max(100, 'Scene type cannot exceed 100 characters').optional().nullable().or(z.literal('')),
   purpose: z.string().max(5000, 'Purpose note cannot exceed 5,000 characters').optional().nullable(),
   locationId: z.string().uuid('Invalid location ID').optional().nullable().or(z.literal('')),
   chapterId: z.string().uuid('Invalid chapter ID').optional().nullable().or(z.literal('')),

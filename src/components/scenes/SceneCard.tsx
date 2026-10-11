@@ -55,7 +55,9 @@ export function SceneCard({
   onDelete,
 }: SceneCardProps) {
   const act = scene.actId ? acts.find((a) => a.id === scene.actId) : scene.act;
-  const actBorderClass = act?.color ? ACT_COLOR_CLASSES[act.color] || 'border-l-brand' : 'border-l-line';
+  const effectiveColor = scene.color || act?.color;
+  const isHex = effectiveColor?.startsWith('#');
+  const actBorderClass = !isHex && effectiveColor ? ACT_COLOR_CLASSES[effectiveColor] || 'border-l-brand' : (!isHex && !effectiveColor ? 'border-l-line' : '');
 
   const statusVariant = STATUS_VARIANTS[scene.status] || 'teal';
   const statusLabel = scene.status.charAt(0).toUpperCase() + scene.status.slice(1);
@@ -72,6 +74,7 @@ export function SceneCard({
         }
       }}
       className={`group relative flex flex-col justify-between rounded-md border border-line bg-surface p-4 transition-all duration-[140ms] hover:border-ink-soft/40 hover:shadow-2xs cursor-pointer border-l-4 ${actBorderClass}`}
+      style={isHex ? { borderLeftColor: effectiveColor } : undefined}
     >
       <div className="space-y-2.5">
         {/* Top Header: Sequence Index, Status, Scene Type, Act Chip */}
