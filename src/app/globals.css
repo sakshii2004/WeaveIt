@@ -1,1 +1,93 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-coral: var(--coral);
+  --color-sun: var(--sun);
+  --color-success: var(--success);
+
+  --color-story-teal-bg: var(--story-teal-bg);
+  --color-story-teal-text: var(--story-teal-text);
+  --color-story-teal-border: var(--story-teal-border);
+
+  --color-story-coral-bg: var(--story-coral-bg);
+  --color-story-coral-text: var(--story-coral-text);
+  --color-story-coral-border: var(--story-coral-border);
+
+  --color-story-sun-bg: var(--story-sun-bg);
+  --color-story-sun-text: var(--story-sun-text);
+  --color-story-sun-border: var(--story-sun-border);
+
+  --color-story-sky-bg: var(--story-sky-bg);
+  --color-story-sky-text: var(--story-sky-text);
+  --color-story-sky-border: var(--story-sky-border);
+
+  --color-story-lavender-bg: var(--story-lavender-bg);
+  --color-story-lavender-text: var(--story-lavender-text);
+  --color-story-lavender-border: var(--story-lavender-border);
+
+  --color-story-mint-bg: var(--story-mint-bg);
+  --color-story-mint-text: var(--story-mint-text);
+  --color-story-mint-border: var(--story-mint-border);
+
+  --color-story-rose-bg: var(--story-rose-bg);
+  --color-story-rose-text: var(--story-rose-text);
+  --color-story-rose-border: var(--story-rose-border);
+
+  --color-story-slate-bg: var(--story-slate-bg);
+  --color-story-slate-text: var(--story-slate-text);
+  --color-story-slate-border: var(--story-slate-border);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-full: var(--radius-full);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --font-sans: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-serif), Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: var(--font-mono), "Courier New", Courier, monospace;
+}
+
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--line);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: var(--ink);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
